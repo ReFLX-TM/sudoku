@@ -1,36 +1,9 @@
 module.exports = function solveSudoku(matrix) {
-  var emptySpot = nextEmtySpot(matrix);
-  var r = emptySpot[0];
-  var c = emptySpot[1];
+  var spot = empty(matrix);
+  var r = spot[0];
+  var c = spot[1];
 
-  if (!isValidSudoku(matrix)) return matrix;
-
-  if (r === -1) {
-    return matrix;
-  };
-
-  var possArr = possiblities(r, c, matrix);
-
-  for (var k = 0; k < possArr.length && nextEmtySpot(matrix)[0] !== -1; k++) {
-      matrix[r][c] = possArr[k];
-      solveSudoku(matrix);
-  }
- 
-  if (nextEmtySpot(matrix)[0] !== -1) matrix[r][c] = 0;
-
-  return matrix;
-}
-
-function nextEmtySpot(matrix) {
-    for (var i = 0; i < 9; i++) {
-        for (var j = 0; j < 9; j++) {
-            if (matrix[i][j] === 0) return [i, j];
-        }
-    }
-    return [-1, -1];
-}
-
-function possiblities(r, c, matrix) {
+  function pos(r, c, matrix) {
     var possArr = [];
     var row = [];
     var col = [];
@@ -58,8 +31,18 @@ function possiblities(r, c, matrix) {
         }
     }
     return possArr;
-}
-function checkQuadrant(r, c, matrix) {
+  }
+  
+  function empty(matrix) {
+    for (var i = 0; i < 9; i++) {
+        for (var j = 0; j < 9; j++) {
+            if (matrix[i][j] === 0) return [i, j];
+        }
+    }
+    return [-1, -1];
+  }
+  
+  function quadrant(r, c, matrix) {
     var qudarantArr = [];
     for (var i = r; i < r + 3; i++) {
         for (var j = c; j < c + 3; j++) {
@@ -71,19 +54,20 @@ function checkQuadrant(r, c, matrix) {
         }
     }
     return true;
-}
-function isValidSudoku(matrix) {
-    if (!checkQuadrant(0, 0, matrix)) return false;
-    if (!checkQuadrant(0, 3, matrix)) return false;
-    if (!checkQuadrant(0, 6, matrix)) return false;
+  }
 
-    if (!checkQuadrant(3, 0, matrix)) return false;
-    if (!checkQuadrant(3, 3, matrix)) return false;
-    if (!checkQuadrant(3, 6, matrix)) return false;
+  function validation(matrix) {
+    if (!quadrant(0, 0, matrix)) return false;
+    if (!quadrant(0, 3, matrix)) return false;
+    if (!quadrant(0, 6, matrix)) return false;
 
-    if (!checkQuadrant(6, 0, matrix)) return false;
-    if (!checkQuadrant(6, 3, matrix)) return false;
-    if (!checkQuadrant(6, 6, matrix)) return false;
+    if (!quadrant(3, 0, matrix)) return false;
+    if (!quadrant(3, 3, matrix)) return false;
+    if (!quadrant(3, 6, matrix)) return false;
+
+    if (!quadrant(6, 0, matrix)) return false;
+    if (!quadrant(6, 3, matrix)) return false;
+    if (!quadrant(6, 6, matrix)) return false;
 
     for (var i = 0; i < matrix.length; i++) {
         var rowNumbers = [];
@@ -107,4 +91,23 @@ function isValidSudoku(matrix) {
         }
     }
     return true;
+  }
+
+
+  if (!validation(matrix)) return matrix;
+
+  if (r === -1) {
+    return matrix;
+  };
+
+  var possArr = pos(r, c, matrix);
+
+  for (var k = 0; k < possArr.length && empty(matrix)[0] !== -1; k++) {
+      matrix[r][c] = possArr[k];
+      solveSudoku(matrix);
+  }
+ 
+  if (empty(matrix)[0] !== -1) matrix[r][c] = 0;
+
+  return matrix;
 }
